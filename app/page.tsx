@@ -1014,12 +1014,6 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-pink-950">
               Applications
             </h2>
-
-            <p className="mt-1 text-sm text-pink-600">
-              Ashanti is purple. Michelle is green.
-              Your selected colors will update this
-              table too.
-            </p>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-pink-200 bg-white shadow-sm">
