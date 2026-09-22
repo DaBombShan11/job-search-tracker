@@ -365,7 +365,7 @@ function PersonCard({
                 onChange={(event) =>
                   onReminderChange(event.target.value)
                 }
-                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none"
+                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none"
               />
 
               {savingReminder && (
@@ -393,7 +393,7 @@ function PersonCard({
               onChange={(event) =>
                 onColorChange(event.target.value)
               }
-              className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-sm outline-none"
+              className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-sm text-gray-900 outline-none"
             >
               {colorOptions.map((color) => (
                 <option
@@ -487,6 +487,13 @@ export default function Home() {
   const [recentRoles, setRecentRoles] = useState<
     string[]
   >([]);
+
+  const [applicationSearch, setApplicationSearch] =
+    useState("");
+  const [applicantFilter, setApplicantFilter] =
+    useState("All");
+  const [statusFilter, setStatusFilter] =
+    useState("All");
 
   const [currentUserId, setCurrentUserId] =
     useState("");
@@ -931,6 +938,45 @@ export default function Home() {
   const michelleColor =
     getPersonColor("Michelle");
 
+  const filteredApplications = applications.filter(
+    (application) => {
+      const search = applicationSearch.trim().toLowerCase();
+
+      const matchesSearch =
+        !search ||
+        [
+          application.user_name,
+          application.company,
+          application.role,
+          application.location,
+          application.source,
+          application.referral_contact,
+          application.compensation,
+          application.status,
+          application.next_step,
+          application.notes,
+        ].some((value) =>
+          value?.toLowerCase().includes(search)
+        );
+
+      const matchesApplicant =
+        applicantFilter === "All" ||
+        application.user_name?.trim().toLowerCase() ===
+          applicantFilter.toLowerCase();
+
+      const matchesStatus =
+        statusFilter === "All" ||
+        application.status?.trim().toLowerCase() ===
+          statusFilter.toLowerCase();
+
+      return (
+        matchesSearch &&
+        matchesApplicant &&
+        matchesStatus
+      );
+    }
+  );
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-pink-100 via-pink-50 to-rose-100 p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -1014,6 +1060,45 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-pink-950">
               Applications
             </h2>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto_auto]">
+              <input
+                type="search"
+                value={applicationSearch}
+                onChange={(event) =>
+                  setApplicationSearch(event.target.value)
+                }
+                placeholder="Search company, role, location, source, notes..."
+                className="w-full rounded-xl border border-pink-200 bg-white px-4 py-2.5 text-gray-900 placeholder:text-gray-400 outline-none focus:border-pink-500"
+              />
+
+              <select
+                value={applicantFilter}
+                onChange={(event) =>
+                  setApplicantFilter(event.target.value)
+                }
+                className="rounded-xl border border-pink-200 bg-white px-4 py-2.5 text-gray-900 outline-none focus:border-pink-500"
+              >
+                <option value="All">All applicants</option>
+                <option value="Ashanti">Ashanti</option>
+                <option value="Michelle">Michelle</option>
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value)
+                }
+                className="rounded-xl border border-pink-200 bg-white px-4 py-2.5 text-gray-900 outline-none focus:border-pink-500"
+              >
+                <option value="All">All statuses</option>
+                <option value="Applied">Applied</option>
+                <option value="OA">OA</option>
+                <option value="Interview">Interview</option>
+                <option value="Offer">Offer</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-pink-200 bg-white shadow-sm">
@@ -1031,7 +1116,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-[1500px] w-full text-left text-sm">
+                <table className="min-w-[1500px] w-full text-left text-sm text-gray-900">
                   <thead className="bg-pink-100 text-xs uppercase tracking-wide text-pink-700">
                     <tr>
                       <th className="p-4">
@@ -1089,7 +1174,18 @@ export default function Home() {
                   </thead>
 
                   <tbody>
-                    {applications.map(
+                    {filteredApplications.length === 0 && (
+                      <tr>
+                        <td
+                          colSpan={13}
+                          className="p-8 text-center text-gray-500"
+                        >
+                          No applications match these filters.
+                        </td>
+                      </tr>
+                    )}
+
+                    {filteredApplications.map(
                       (application) => {
                         const personColor =
                           getPersonColor(
@@ -1190,7 +1286,7 @@ export default function Home() {
                                         .value
                                     )
                                   }
-                                  className="rounded-lg border border-pink-200 bg-white px-2 py-2 font-medium outline-none focus:border-pink-500"
+                                  className="rounded-lg border border-pink-200 bg-white px-2 py-2 font-medium text-gray-900 outline-none focus:border-pink-500"
                                 >
                                   <option value="Applied">
                                     Applied
